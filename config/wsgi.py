@@ -11,6 +11,11 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.development')
+# Use production settings for Vercel
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.production')
 
-application = get_wsgi_application() 
+# Create the WSGI application
+application = get_wsgi_application()
+
+# Vercel needs the variable to be named 'app'
+app = application 
