@@ -1,0 +1,75 @@
+{% extends "admin/drinks/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div id="content-main">
+    <div class="app-drinks module">
+        <table>
+            <caption>
+                <a href="#" class="section">{% trans "Drinks" %}</a>
+            </caption>
+            <tbody>
+                <tr>
+                    <th scope="row">
+                        <a href="{% url 'admin:drinks_drink_list' %}">{% trans "Drinks" %}</a>
+                    </th>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <a href="{% url 'admin:drinks_ingrediente_list' %}">{% trans "Ingredients" %}</a>
+                    </th>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <a href="{% url 'admin:drinks_utensilio_list' %}">{% trans "Utensils" %}</a>
+                    </th>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="app-drinks module">
+        <table>
+            <caption>
+                <a href="#" class="section">{% trans "References" %}</a>
+            </caption>
+            <tbody>
+                <tr>
+                    <th scope="row">
+                        <a href="{% url 'admin:drinks_tipoingrediente_list' %}">{% trans "Ingredient Types" %}</a>
+                    </th>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <a href="{% url 'admin:drinks_tipoutensilio_list' %}">{% trans "Utensil Types" %}</a>
+                    </th>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <a href="{% url 'admin:drinks_unidademedida_list' %}">{% trans "Measurement Units" %}</a>
+                    </th>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <a href="{% url 'admin:drinks_perfilsabor_list' %}">{% trans "Flavor Profiles" %}</a>
+                    </th>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} 

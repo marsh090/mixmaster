@@ -1,17 +1,20 @@
 from .base import *
-import os
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 DEBUG = False
-ALLOWED_HOSTS = ['.vercel.app', 'your-domain.com']
+ALLOWED_HOSTS = ['.vercel.app']  # Adicione seu domínio aqui
 
-# Configuração de arquivos estáticos
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# Database
+DATABASES = {
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': os.environ.get('MONGODB_NAME'),
+        'CLIENT': {
+            'host': os.environ.get('MONGODB_URI'),
+        }
+    }
+}
 
-# Configuração de segurança
+# Security
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True

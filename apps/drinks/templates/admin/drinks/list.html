@@ -1,0 +1,54 @@
+{% extends "admin/drinks/base.html" %}
+{% load i18n admin_urls static %}
+
+{% block content %}
+<div id="content-main">
+    {% if has_add_permission %}
+        <ul class="object-tools">
+            <li>
+                <a href="{{ add_url }}" class="addlink">
+                    {% blocktrans with name=opts.verbose_name %}Add {{ name }}{% endblocktrans %}
+                </a>
+            </li>
+        </ul>
+    {% endif %}
+
+    <div class="module" id="changelist">
+        <div class="results">
+            <table id="result_list">
+                <thead>
+                    <tr>
+                        {% for header in list_headers %}
+                            <th scope="col">
+                                {{ header }}
+                            </th>
+                        {% endfor %}
+                        {% if has_change_permission or has_delete_permission %}
+                            <th scope="col">{% trans "Actions" %}</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                        <tr class="{% cycle 'row1' 'row2' %}">
+                            {% for item in result.items %}
+                                <td>{{ item }}</td>
+                            {% endfor %}
+                            {% if has_change_permission or has_delete_permission %}
+                                <td>
+                                    {% if has_change_permission %}
+                                        <a href="{{ result.change_url }}" class="button">{% trans "Edit" %}</a>
+                                    {% endif %}
+                                    {% if has_delete_permission %}
+                                        <a href="{{ result.delete_url }}" class="button deletelink">{% trans "Delete" %}</a>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

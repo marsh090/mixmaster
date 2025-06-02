@@ -1,0 +1,273 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+<style>
+  :root {
+    --primary: #79aec8;
+    --secondary: #417690;
+    --accent: #f5dd5d;
+    --primary-fg: #fff;
+    --body-fg: #333;
+    --body-bg: #fff;
+    --body-quiet-color: #666;
+    --body-loud-color: #000;
+    --header-color: #ffc;
+    --header-branding-color: var(--accent);
+    --header-bg: var(--secondary);
+    --header-link-color: var(--primary-fg);
+    --breadcrumbs-fg: #c4dce8;
+    --breadcrumbs-link-fg: var(--body-bg);
+    --breadcrumbs-bg: var(--primary);
+    --link-fg: #447e9b;
+    --link-hover-color: #036;
+    --link-selected-fg: #5b80b2;
+    --hairline-color: #e8e8e8;
+    --border-color: #ccc;
+    --error-fg: #ba2121;
+    --message-success-bg: #dfd;
+    --message-warning-bg: #ffc;
+    --message-error-bg: #ffefef;
+    --darkened-bg: #f8f8f8;
+    --selected-bg: #e4e4e4;
+    --selected-row: #ffc;
+    --button-fg: #fff;
+    --button-bg: var(--primary);
+    --button-hover-bg: #609ab6;
+    --default-button-bg: var(--secondary);
+    --default-button-hover-bg: #205067;
+    --close-button-bg: #888;
+    --close-button-hover-bg: #747474;
+    --delete-button-bg: #ba2121;
+    --delete-button-hover-bg: #a41515;
+  }
+
+  /* Layout */
+  #container {
+    min-width: 980px;
+    padding: 0;
+  }
+
+  #content {
+    padding: 20px 40px;
+  }
+
+  /* Header */
+  #header {
+    width: auto;
+    height: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 40px;
+    background: var(--header-bg);
+    color: var(--header-color);
+    overflow: hidden;
+  }
+
+  #branding h1 {
+    padding: 0;
+    margin: 0 20px 0 0;
+    font-weight: 300;
+    font-size: 24px;
+    color: var(--header-branding-color);
+  }
+
+  #branding h1, #branding h1 a:link, #branding h1 a:visited {
+    color: var(--header-branding-color);
+  }
+
+  #user-tools {
+    float: right;
+    padding: 0;
+    margin: 0 0 0 20px;
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: right;
+  }
+
+  #user-tools a {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  }
+
+  #user-tools a:focus, #user-tools a:hover {
+    text-decoration: none;
+    border-bottom-color: var(--primary-fg);
+    color: var(--primary-fg);
+  }
+
+  /* Breadcrumbs */
+  div.breadcrumbs {
+    background: var(--breadcrumbs-bg);
+    padding: 10px 40px;
+    border: none;
+    color: var(--breadcrumbs-fg);
+    text-align: left;
+  }
+
+  div.breadcrumbs a {
+    color: var(--breadcrumbs-link-fg);
+  }
+
+  div.breadcrumbs a:focus, div.breadcrumbs a:hover {
+    color: var(--breadcrumbs-link-fg);
+    text-decoration: underline;
+  }
+
+  /* Content */
+  .content-main {
+    float: left;
+    width: 100%;
+  }
+
+  .content-main .object-tools {
+    float: right;
+    padding: 0;
+    margin: 0 0 20px 20px;
+  }
+
+  .object-tools a.addlink {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .object-tools a:link, .object-tools a:visited {
+    display: block;
+    float: left;
+    padding: 3px 12px;
+    background: var(--button-bg);
+    color: var(--button-fg);
+    font-weight: 400;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 15px;
+  }
+
+  .object-tools a:focus, .object-tools a:hover {
+    background-color: var(--button-hover-bg);
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    background: var(--body-bg);
+    border: 1px solid var(--border-color);
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  th {
+    text-align: left;
+    background: var(--darkened-bg);
+    padding: 8px;
+  }
+
+  td {
+    padding: 8px;
+    border-bottom: 1px solid var(--hairline-color);
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Forms */
+  .form-row {
+    padding: 10px;
+    border-bottom: 1px solid var(--hairline-color);
+  }
+
+  .form-row:last-child {
+    border-bottom: none;
+  }
+
+  .form-row label {
+    display: block;
+    padding: 0 10px 0 0;
+    float: left;
+    width: 150px;
+    word-wrap: break-word;
+  }
+
+  .form-row .field-box {
+    float: left;
+    margin-right: 20px;
+  }
+
+  /* Buttons */
+  .button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: var(--button-bg);
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    color: var(--button-fg);
+    cursor: pointer;
+  }
+
+  .button:active, input[type=submit]:active, input[type=button]:active,
+  .button:focus, input[type=submit]:focus, input[type=button]:focus,
+  .button:hover, input[type=submit]:hover, input[type=button]:hover {
+    background: var(--button-hover-bg);
+  }
+
+  .button.default, input[type=submit].default, .submit-row input.default {
+    background: var(--default-button-bg);
+  }
+
+  .button.default:active, input[type=submit].default:active,
+  .button.default:focus, input[type=submit].default:focus,
+  .button.default:hover, input[type=submit].default:hover {
+    background: var(--default-button-hover-bg);
+  }
+
+  .deletelink {
+    background: var(--delete-button-bg);
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    color: var(--button-fg);
+    cursor: pointer;
+  }
+
+  .deletelink:active, .deletelink:focus, .deletelink:hover {
+    background: var(--delete-button-hover-bg);
+  }
+
+  /* Messages */
+  ul.messagelist {
+    padding: 0;
+    margin: 0;
+  }
+
+  ul.messagelist li {
+    display: block;
+    padding: 10px 10px 10px 65px;
+    margin: 0 0 10px 0;
+    border-radius: 4px;
+  }
+
+  ul.messagelist li.success {
+    background: var(--message-success-bg);
+  }
+
+  ul.messagelist li.warning {
+    background: var(--message-warning-bg);
+  }
+
+  ul.messagelist li.error {
+    background: var(--message-error-bg);
+  }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+  <a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+ 
