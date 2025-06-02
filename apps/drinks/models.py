@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 # Conectar ao MongoDB Atlas usando variáveis de ambiente
 client = MongoClient(settings.MONGODB_URI)
-db = client[settings.MONGODB_NAME]
+db = settings.MONGODB_DB
 
 class MongoModel:
     """Classe base para modelos MongoDB"""
