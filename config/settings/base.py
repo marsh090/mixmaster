@@ -1,12 +1,27 @@
 import os
 from pathlib import Path
 from datetime import timedelta
+import pymongo
+from urllib.parse import quote_plus
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
+
+# MongoDB Connection
+MONGODB_URI = os.environ.get('MONGODB_URI')
+MONGODB_CLIENT = pymongo.MongoClient(MONGODB_URI)
+MONGODB_DB = MONGODB_CLIENT[os.environ.get('MONGODB_NAME')]
+
+# Database
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.dummy',  # Não usamos ORM do Django
+        'NAME': os.environ.get('MONGODB_NAME'),
+    }
+}
 
 # Application definition
 INSTALLED_APPS = [
