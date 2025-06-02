@@ -4,24 +4,15 @@
         {
             "src": "config/wsgi.py",
             "use": "@vercel/python"
-        },
-        {
-            "src": "static/**",
-            "use": "@vercel/static"
         }
     ],
     "routes": [
-        {
-            "src": "/static/(.*)",
-            "dest": "/static/$1"
-        },
         {
             "src": "/(.*)",
             "dest": "config/wsgi.py"
         }
     ],
     "env": {
-        "PYTHON_VERSION": "3.11",
-        "DJANGO_SETTINGS_MODULE": "config.settings.production"
+        "PYTHONPATH": "."
     }
 }
