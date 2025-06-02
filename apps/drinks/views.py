@@ -2,7 +2,9 @@ from django.shortcuts import render
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
+from bson import ObjectId
 from .models import (
     TipoIngrediente, TipoUtensilio, UnidadeMedida,
     PerfilSabor, Ingrediente, Utensilio, Drink
@@ -12,21 +14,54 @@ from .serializers import (
     PerfilSaborSerializer, IngredienteSerializer, UtensilioSerializer, DrinkSerializer
 )
 
-class BaseViewSet(viewsets.ViewSet):
-    """ViewSet base com operações comuns"""
-    permission_classes = [permissions.IsAuthenticated]
-    model_class = None
-    serializer_class = None
-
+@extend_schema_view(
+    list=extend_schema(summary="Listar itens"),
+    create=extend_schema(summary="Criar item"),
+    retrieve=extend_schema(
+        summary="Detalhes do item",
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="ID do item (ObjectId)"
+            )
+        ]
+    ),
+    update=extend_schema(
+        summary="Atualizar item",
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="ID do item (ObjectId)"
+            )
+        ]
+    ),
+    destroy=extend_schema(
+        summary="Remover item",
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="ID do item (ObjectId)"
+            )
+        ]
+    )
+)
+class MongoViewSet(viewsets.ViewSet):
+    """ViewSet base para modelos MongoDB"""
+    
     def get_object(self, pk):
-        from bson.objectid import ObjectId
-        obj = self.model_class.find_one({"_id": ObjectId(pk)})
-        if not obj:
+        try:
+            return self.model_class.find_one({'_id': ObjectId(pk)})
+        except:
             return None
-        return obj
 
     def list(self, request):
-        objects = self.model_class.find_all()
+        objects = list(self.model_class.find())
         serializer = self.serializer_class(objects, many=True)
         return Response(serializer.data)
 
@@ -58,7 +93,7 @@ class BaseViewSet(viewsets.ViewSet):
         obj = self.get_object(pk)
         if not obj:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        self.model_class.delete(obj['_id'])
+        self.model_class.delete_one({'_id': ObjectId(pk)})
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 @extend_schema_view(
@@ -66,55 +101,55 @@ class BaseViewSet(viewsets.ViewSet):
     create=extend_schema(summary="Criar tipo de ingrediente"),
     retrieve=extend_schema(summary="Detalhes do tipo de ingrediente"),
     update=extend_schema(summary="Atualizar tipo de ingrediente"),
-    destroy=extend_schema(summary="Remover tipo de ingrediente"),
+    destroy=extend_schema(summary="Remover tipo de ingrediente")
 )
-class TipoIngredienteViewSet(BaseViewSet):
-    model_class = TipoIngrediente
+class TipoIngredienteViewSet(MongoViewSet):
     serializer_class = TipoIngredienteSerializer
+    model_class = TipoIngrediente
 
 @extend_schema_view(
     list=extend_schema(summary="Listar tipos de utensílio"),
     create=extend_schema(summary="Criar tipo de utensílio"),
     retrieve=extend_schema(summary="Detalhes do tipo de utensílio"),
     update=extend_schema(summary="Atualizar tipo de utensílio"),
-    destroy=extend_schema(summary="Remover tipo de utensílio"),
+    destroy=extend_schema(summary="Remover tipo de utensílio")
 )
-class TipoUtensilioViewSet(BaseViewSet):
-    model_class = TipoUtensilio
+class TipoUtensilioViewSet(MongoViewSet):
     serializer_class = TipoUtensilioSerializer
+    model_class = TipoUtensilio
 
 @extend_schema_view(
     list=extend_schema(summary="Listar unidades de medida"),
     create=extend_schema(summary="Criar unidade de medida"),
     retrieve=extend_schema(summary="Detalhes da unidade de medida"),
     update=extend_schema(summary="Atualizar unidade de medida"),
-    destroy=extend_schema(summary="Remover unidade de medida"),
+    destroy=extend_schema(summary="Remover unidade de medida")
 )
-class UnidadeMedidaViewSet(BaseViewSet):
-    model_class = UnidadeMedida
+class UnidadeMedidaViewSet(MongoViewSet):
     serializer_class = UnidadeMedidaSerializer
+    model_class = UnidadeMedida
 
 @extend_schema_view(
     list=extend_schema(summary="Listar perfis de sabor"),
     create=extend_schema(summary="Criar perfil de sabor"),
     retrieve=extend_schema(summary="Detalhes do perfil de sabor"),
     update=extend_schema(summary="Atualizar perfil de sabor"),
-    destroy=extend_schema(summary="Remover perfil de sabor"),
+    destroy=extend_schema(summary="Remover perfil de sabor")
 )
-class PerfilSaborViewSet(BaseViewSet):
-    model_class = PerfilSabor
+class PerfilSaborViewSet(MongoViewSet):
     serializer_class = PerfilSaborSerializer
+    model_class = PerfilSabor
 
 @extend_schema_view(
     list=extend_schema(summary="Listar ingredientes"),
     create=extend_schema(summary="Criar ingrediente"),
     retrieve=extend_schema(summary="Detalhes do ingrediente"),
     update=extend_schema(summary="Atualizar ingrediente"),
-    destroy=extend_schema(summary="Remover ingrediente"),
+    destroy=extend_schema(summary="Remover ingrediente")
 )
-class IngredienteViewSet(BaseViewSet):
-    model_class = Ingrediente
+class IngredienteViewSet(MongoViewSet):
     serializer_class = IngredienteSerializer
+    model_class = Ingrediente
 
     @extend_schema(summary="Buscar ingredientes por texto")
     @action(detail=False, methods=['get'])
@@ -137,11 +172,11 @@ class IngredienteViewSet(BaseViewSet):
     create=extend_schema(summary="Criar utensílio"),
     retrieve=extend_schema(summary="Detalhes do utensílio"),
     update=extend_schema(summary="Atualizar utensílio"),
-    destroy=extend_schema(summary="Remover utensílio"),
+    destroy=extend_schema(summary="Remover utensílio")
 )
-class UtensilioViewSet(BaseViewSet):
-    model_class = Utensilio
+class UtensilioViewSet(MongoViewSet):
     serializer_class = UtensilioSerializer
+    model_class = Utensilio
 
     @extend_schema(summary="Buscar utensílios por texto")
     @action(detail=False, methods=['get'])
@@ -165,10 +200,32 @@ class UtensilioViewSet(BaseViewSet):
     retrieve=extend_schema(summary="Detalhes do drink"),
     update=extend_schema(summary="Atualizar drink"),
     destroy=extend_schema(summary="Remover drink"),
+    search=extend_schema(
+        summary="Buscar drinks por texto",
+        parameters=[
+            OpenApiParameter(
+                name="q",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description="Texto para busca no nome ou descrição"
+            )
+        ]
+    ),
+    duplicate=extend_schema(
+        summary="Duplicar drink existente",
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                description="ID do drink a ser duplicado"
+            )
+        ]
+    )
 )
-class DrinkViewSet(BaseViewSet):
-    model_class = Drink
+class DrinkViewSet(MongoViewSet):
     serializer_class = DrinkSerializer
+    model_class = Drink
 
     def get_queryset(self):
         """Filtra drinks baseado em parâmetros"""
@@ -185,7 +242,6 @@ class DrinkViewSet(BaseViewSet):
         
         return queryset
 
-    @extend_schema(summary="Buscar drinks por texto")
     @action(detail=False, methods=['get'])
     def search(self, request):
         """Busca drinks por texto no nome ou descrição"""
@@ -204,7 +260,6 @@ class DrinkViewSet(BaseViewSet):
         serializer = self.serializer_class(list(drinks), many=True)
         return Response(serializer.data)
 
-    @extend_schema(summary="Duplicar drink existente")
     @action(detail=True, methods=['post'])
     def duplicate(self, request, pk=None):
         """Duplica um drink existente"""

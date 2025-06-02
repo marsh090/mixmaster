@@ -24,102 +24,175 @@ class MongoModelForm(forms.Form):
 
 class TipoReferenciaForm(MongoModelForm):
     """Form para tipos de referência (ingredientes, utensílios, etc)"""
-    nome = forms.CharField(max_length=100)
-    nome_en = forms.CharField(max_length=100)
-    ordem = forms.IntegerField(required=False)
+    nome = forms.CharField(max_length=100, label='Nome', help_text='Nome em português')
+    nome_en = forms.CharField(max_length=100, label='Nome em inglês', help_text='Nome em inglês')
 
 class UnidadeMedidaForm(MongoModelForm):
     """Form para unidades de medida"""
-    nome = forms.CharField(max_length=100)
-    nome_en = forms.CharField(max_length=100)
-    tipo = forms.ChoiceField(choices=[('volume', 'Volume'), ('peso', 'Peso'), ('unidade', 'Unidade')])
-    conversao_ml = forms.FloatField(required=False, help_text='Conversão para mililitros (apenas para unidades de volume)')
+    nome = forms.CharField(max_length=100, label='Nome', help_text='Nome em português')
+    nome_en = forms.CharField(max_length=100, label='Nome em inglês', help_text='Nome em inglês')
+    tipo = forms.ChoiceField(
+        choices=[
+            ('volume', 'Volume'),
+            ('peso', 'Peso'),
+            ('unidade', 'Unidade')
+        ],
+        label='Tipo',
+        help_text='Tipo de unidade de medida'
+    )
+    conversao_ml = forms.FloatField(
+        required=False,
+        label='Conversão para ml',
+        help_text='Conversão para mililitros (apenas para unidades de volume)'
+    )
 
 class IngredienteForm(MongoModelForm):
     """Form para ingredientes"""
-    nome = forms.CharField(max_length=100)
-    nome_en = forms.CharField(max_length=100)
-    tipo = forms.CharField(max_length=100)
-    descricao = forms.CharField(widget=forms.Textarea, required=False)
-    descricao_en = forms.CharField(widget=forms.Textarea, required=False)
-    perfis_sabor = forms.MultipleChoiceField(choices=[], required=False)
-    teor_alcoolico = forms.FloatField(required=False)
-    densidade = forms.FloatField(required=False)
+    nome = forms.CharField(max_length=100, label='Nome', help_text='Nome em português')
+    nome_en = forms.CharField(max_length=100, label='Nome em inglês', help_text='Nome em inglês')
+    tipo = forms.MultipleChoiceField(
+        choices=[],  # Será preenchido no __init__
+        label='Tipos',
+        help_text='Tipos do ingrediente',
+        widget=forms.SelectMultiple(attrs={'size': '5'})
+    )
+    unidades_permitidas = forms.MultipleChoiceField(
+        choices=[],  # Será preenchido no __init__
+        label='Unidades permitidas',
+        help_text='Unidades de medida permitidas para este ingrediente',
+        widget=forms.SelectMultiple(attrs={'size': '5'})
+    )
+    descricao = forms.CharField(
+        widget=forms.Textarea,
+        required=False,
+        label='Descrição',
+        help_text='Descrição do ingrediente'
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Carregar opções dinâmicas
-        self.fields['tipo'].widget = forms.Select(choices=[(t['nome'], t['nome']) for t in TipoIngrediente.find()])
-        self.fields['perfis_sabor'].choices = [(p['nome'], p['nome']) for p in PerfilSabor.find()]
+        # Buscar tipos de ingrediente e unidades de medida do MongoDB
+        tipos = TipoIngrediente.find()
+        unidades = UnidadeMedida.find()
+        self.fields['tipo'].choices = [
+            (t['nome'], t['nome']) for t in tipos
+        ]
+        self.fields['unidades_permitidas'].choices = [
+            (u['nome'], u['nome']) for u in unidades
+        ]
 
 class UtensilioForm(MongoModelForm):
     """Form para utensílios"""
-    nome = forms.CharField(max_length=100)
-    nome_en = forms.CharField(max_length=100)
-    tipo = forms.CharField(max_length=100)
-    descricao = forms.CharField(widget=forms.Textarea, required=False)
-    descricao_en = forms.CharField(widget=forms.Textarea, required=False)
+    nome = forms.CharField(max_length=100, label='Nome', help_text='Nome em português')
+    nome_en = forms.CharField(max_length=100, label='Nome em inglês', help_text='Nome em inglês')
+    tipo = forms.MultipleChoiceField(
+        choices=[],  # Será preenchido no __init__
+        label='Tipos',
+        help_text='Tipos do utensílio',
+        widget=forms.SelectMultiple(attrs={'size': '5'})
+    )
+    descricao = forms.CharField(
+        widget=forms.Textarea,
+        required=False,
+        label='Descrição',
+        help_text='Descrição do utensílio'
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Carregar opções dinâmicas
-        self.fields['tipo'].widget = forms.Select(choices=[(t['nome'], t['nome']) for t in TipoUtensilio.find()])
+        # Buscar tipos de utensílio do MongoDB
+        tipos = TipoUtensilio.find()
+        self.fields['tipo'].choices = [
+            (t['nome'], t['nome']) for t in tipos
+        ]
 
 class DrinkForm(MongoModelForm):
     """Form para drinks"""
-    nome = forms.CharField(max_length=100)
-    nome_en = forms.CharField(max_length=100)
-    descricao = forms.CharField(widget=forms.Textarea, required=False)
-    descricao_en = forms.CharField(widget=forms.Textarea, required=False)
-    nivel_dificuldade = forms.ChoiceField(choices=[
-        ('facil', 'Fácil'),
-        ('medio', 'Médio'),
-        ('dificil', 'Difícil')
-    ])
-    tempo_preparo = forms.IntegerField(help_text='Tempo em minutos')
-    rendimento = forms.IntegerField(help_text='Quantidade de drinks')
-    teor_alcoolico = forms.FloatField(required=False)
-    calorias = forms.FloatField(required=False)
-    ingredientes = forms.CharField(widget=forms.Textarea, help_text='Um ingrediente por linha, no formato: quantidade unidade nome')
-    utensilios = forms.MultipleChoiceField(choices=[], required=False)
-    modo_preparo = forms.CharField(widget=forms.Textarea)
-    modo_preparo_en = forms.CharField(widget=forms.Textarea)
-    dicas = forms.CharField(widget=forms.Textarea, required=False)
-    dicas_en = forms.CharField(widget=forms.Textarea, required=False)
-    tags = forms.CharField(widget=forms.Textarea, required=False, help_text='Uma tag por linha')
+    nome = forms.CharField(max_length=100, label='Nome', help_text='Nome em português')
+    nome_en = forms.CharField(max_length=100, label='Nome em inglês', help_text='Nome em inglês')
+    nivel_dificuldade = forms.ChoiceField(
+        choices=[
+            ('facil', 'Fácil'),
+            ('medio', 'Médio'),
+            ('dificil', 'Difícil')
+        ],
+        label='Nível de dificuldade'
+    )
+    teor_alcoolico = forms.ChoiceField(
+        choices=[
+            ('zero', 'Zero'),
+            ('baixo', 'Baixo'),
+            ('medio', 'Médio'),
+            ('alto', 'Alto')
+        ],
+        label='Teor alcoólico'
+    )
+    descricao = forms.CharField(
+        widget=forms.Textarea,
+        required=False,
+        label='Descrição',
+        help_text='Descrição do drink'
+    )
+    modo_preparo = forms.CharField(
+        widget=forms.Textarea,
+        label='Modo de preparo',
+        help_text='Instruções passo a passo para preparar o drink'
+    )
+    spirits = forms.MultipleChoiceField(
+        choices=[],  # Será preenchido no __init__
+        label='Spirits',
+        help_text='Destilados e licores',
+        widget=forms.SelectMultiple(attrs={'size': '5'}),
+        required=False
+    )
+    outros_ingredientes = forms.MultipleChoiceField(
+        choices=[],  # Será preenchido no __init__
+        label='Outros Ingredientes',
+        help_text='Frutas, xaropes, sucos, etc',
+        widget=forms.SelectMultiple(attrs={'size': '5'}),
+        required=False
+    )
+    utensilios = forms.MultipleChoiceField(
+        choices=[],  # Será preenchido no __init__
+        label='Utensílios',
+        help_text='Utensílios necessários',
+        widget=forms.SelectMultiple(attrs={'size': '5'})
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Carregar opções dinâmicas
-        self.fields['utensilios'].choices = [(u['nome'], u['nome']) for u in Utensilio.find()]
+        # Buscar ingredientes e utensílios do MongoDB
+        ingredientes = list(Ingrediente.find())
+        utensilios = list(Utensilio.find())
 
-    def clean_ingredientes(self):
-        """Converte a string de ingredientes em uma lista de dicionários"""
-        ingredientes = []
-        for linha in self.cleaned_data['ingredientes'].split('\n'):
-            if not linha.strip():
-                continue
-            partes = linha.strip().split()
-            if len(partes) >= 3:
-                quantidade = float(partes[0])
-                unidade = partes[1]
-                nome = ' '.join(partes[2:])
-                ingredientes.append({
-                    'quantidade': quantidade,
-                    'unidade': unidade,
-                    'nome': nome
-                })
-        return ingredientes
+        # Separar ingredientes por tipo
+        spirits = [i for i in ingredientes if 'Destilado' in i.get('tipo', []) or 'Licor' in i.get('tipo', [])]
+        outros = [i for i in ingredientes if 'Destilado' not in i.get('tipo', []) and 'Licor' not in i.get('tipo', [])]
 
-    def clean_tags(self):
-        """Converte a string de tags em uma lista"""
-        return [tag.strip() for tag in self.cleaned_data['tags'].split('\n') if tag.strip()]
+        self.fields['spirits'].choices = [
+            (i['nome'], i['nome']) for i in spirits
+        ]
+        self.fields['outros_ingredientes'].choices = [
+            (i['nome'], i['nome']) for i in outros
+        ]
+        self.fields['utensilios'].choices = [
+            (u['nome'], u['nome']) for u in utensilios
+        ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Combinar spirits e outros_ingredientes em uma única lista
+        spirits = cleaned_data.get('spirits', [])
+        outros = cleaned_data.get('outros_ingredientes', [])
+        cleaned_data['ingredientes'] = spirits + outros
+        return cleaned_data
 
 class MongoModelAdmin:
     """Admin base para modelos MongoDB"""
     form_class = MongoModelForm
     list_display = ['nome']
     template_dir = 'admin/drinks'
+    has_order = False  # Flag para indicar se o modelo usa ordem automática
 
     def __init__(self, model_class):
         self.model = model_class
@@ -133,11 +206,12 @@ class MongoModelAdmin:
 
     def get_urls(self):
         """Retorna as URLs do admin"""
+        info = self.opts.app_label, self.model_name
         return [
-            path('', self.list_view, name=f'drinks_{self.model_name}_list'),
-            path('add/', self.add_view, name=f'drinks_{self.model_name}_add'),
-            path('<str:object_id>/change/', self.change_view, name=f'drinks_{self.model_name}_change'),
-            path('<str:object_id>/delete/', self.delete_view, name=f'drinks_{self.model_name}_delete'),
+            path('', self.list_view, name='%s_%s_list' % info),
+            path('add/', self.add_view, name='%s_%s_add' % info),
+            path('<str:object_id>/change/', self.change_view, name='%s_%s_change' % info),
+            path('<str:object_id>/delete/', self.delete_view, name='%s_%s_delete' % info),
         ]
 
     @property
@@ -168,14 +242,14 @@ class MongoModelAdmin:
             obj_id = str(obj['_id'])
             results.append({
                 'items': items,
-                'change_url': reverse(f'admin:drinks_{self.model_name}_change', args=[obj_id]),
-                'delete_url': reverse(f'admin:drinks_{self.model_name}_delete', args=[obj_id])
+                'change_url': reverse('admin:%s_%s_change' % (self.opts.app_label, self.model_name), args=[obj_id]),
+                'delete_url': reverse('admin:%s_%s_delete' % (self.opts.app_label, self.model_name), args=[obj_id])
             })
 
         context = self.get_context(request, {
             'results': results,
             'list_headers': headers,
-            'add_url': reverse(f'admin:drinks_{self.model_name}_add'),
+            'add_url': reverse('admin:%s_%s_add' % (self.opts.app_label, self.model_name)),
         })
         
         return render(request, f'{self.template_dir}/list.html', context)
@@ -185,12 +259,27 @@ class MongoModelAdmin:
         if request.method == 'POST':
             form = self.form_class(request.POST)
             if form.is_valid():
-                self.model.insert_one(form.cleaned_data)
-                return HttpResponseRedirect(reverse(f'admin:drinks_{self.model_name}_list'))
+                data = form.cleaned_data
+                if self.has_order:
+                    # Encontrar a maior ordem atual
+                    last_item = next(self.model.find().sort([('ordem', -1)]).limit(1), None)
+                    data['ordem'] = (last_item['ordem'] + 1) if last_item else 1
+                # Se for um drink, remover os campos temporários
+                if isinstance(form, DrinkForm):
+                    data.pop('spirits', None)
+                    data.pop('outros_ingredientes', None)
+                self.model.insert_one(data)
+                return HttpResponseRedirect(reverse('admin:%s_%s_list' % (self.opts.app_label, self.model_name)))
         else:
             form = self.form_class()
 
+        adminform = type('AdminForm', (), {
+            'form': form,
+            'fieldsets': [(None, {'fields': list(form.fields.keys())})],
+        })
+
         context = self.get_context(request, {
+            'adminform': adminform,
             'form': form,
             'add': True,
             'show_save': True,
@@ -206,21 +295,48 @@ class MongoModelAdmin:
         if request.method == 'POST':
             form = self.form_class(request.POST, instance=obj)
             if form.is_valid():
+                data = form.cleaned_data
+                # Se for um drink, remover os campos temporários
+                if isinstance(form, DrinkForm):
+                    data.pop('spirits', None)
+                    data.pop('outros_ingredientes', None)
                 self.model.update_one(
                     {'_id': ObjectId(object_id)},
-                    {'$set': form.cleaned_data}
+                    {'$set': data}
                 )
-                return HttpResponseRedirect(reverse(f'admin:drinks_{self.model_name}_list'))
+                return HttpResponseRedirect(reverse('admin:%s_%s_list' % (self.opts.app_label, self.model_name)))
         else:
+            # Se for um drink, separar os ingredientes em spirits e outros
+            if isinstance(self.form_class, type(DrinkForm)):
+                ingredientes = obj.get('ingredientes', [])
+                # Buscar todos os ingredientes para verificar seus tipos
+                todos_ingredientes = {i['nome']: i for i in Ingrediente.find()}
+                spirits = []
+                outros = []
+                for ing in ingredientes:
+                    if ing in todos_ingredientes:
+                        tipos = todos_ingredientes[ing].get('tipo', [])
+                        if 'Destilado' in tipos or 'Licor' in tipos:
+                            spirits.append(ing)
+                        else:
+                            outros.append(ing)
+                obj['spirits'] = spirits
+                obj['outros_ingredientes'] = outros
             form = self.form_class(instance=obj)
 
+        adminform = type('AdminForm', (), {
+            'form': form,
+            'fieldsets': [(None, {'fields': list(form.fields.keys())})],
+        })
+
         context = self.get_context(request, {
+            'adminform': adminform,
             'form': form,
             'object_id': object_id,
             'show_save': True,
             'show_save_and_continue': True,
             'show_delete': True,
-            'delete_url': reverse(f'admin:drinks_{self.model_name}_delete', args=[object_id]),
+            'delete_url': reverse('admin:%s_%s_delete' % (self.opts.app_label, self.model_name), args=[object_id]),
         })
         
         return render(request, f'{self.template_dir}/form.html', context)
@@ -230,11 +346,11 @@ class MongoModelAdmin:
         obj = self.model.find_one({'_id': ObjectId(object_id)})
         if request.method == 'POST':
             self.model.delete_one({'_id': ObjectId(object_id)})
-            return HttpResponseRedirect(reverse(f'admin:drinks_{self.model_name}_list'))
+            return HttpResponseRedirect(reverse('admin:%s_%s_list' % (self.opts.app_label, self.model_name)))
 
         context = self.get_context(request, {
             'object': obj,
-            'cancel_url': reverse(f'admin:drinks_{self.model_name}_list'),
+            'cancel_url': reverse('admin:%s_%s_list' % (self.opts.app_label, self.model_name)),
         })
         
         return render(request, f'{self.template_dir}/delete.html', context)
@@ -253,27 +369,30 @@ class DrinksAdminSite(admin.AdminSite):
         tipo_ingrediente_admin = MongoModelAdmin(TipoIngrediente)
         tipo_ingrediente_admin.form_class = TipoReferenciaForm
         tipo_ingrediente_admin.list_display = ['nome', 'nome_en', 'ordem']
-        
+        tipo_ingrediente_admin.has_order = True
+
         tipo_utensilio_admin = MongoModelAdmin(TipoUtensilio)
         tipo_utensilio_admin.form_class = TipoReferenciaForm
         tipo_utensilio_admin.list_display = ['nome', 'nome_en', 'ordem']
-        
+        tipo_utensilio_admin.has_order = True
+
         unidade_medida_admin = MongoModelAdmin(UnidadeMedida)
         unidade_medida_admin.form_class = UnidadeMedidaForm
         unidade_medida_admin.list_display = ['nome', 'nome_en', 'tipo', 'conversao_ml']
-        
+
         perfil_sabor_admin = MongoModelAdmin(PerfilSabor)
         perfil_sabor_admin.form_class = TipoReferenciaForm
         perfil_sabor_admin.list_display = ['nome', 'nome_en', 'ordem']
-        
+        perfil_sabor_admin.has_order = True
+
         ingrediente_admin = MongoModelAdmin(Ingrediente)
         ingrediente_admin.form_class = IngredienteForm
         ingrediente_admin.list_display = ['nome', 'nome_en', 'tipo']
-        
+
         utensilio_admin = MongoModelAdmin(Utensilio)
         utensilio_admin.form_class = UtensilioForm
         utensilio_admin.list_display = ['nome', 'nome_en', 'tipo']
-        
+
         drink_admin = MongoModelAdmin(Drink)
         drink_admin.form_class = DrinkForm
         drink_admin.list_display = ['nome', 'nome_en', 'nivel_dificuldade', 'teor_alcoolico']
@@ -289,7 +408,7 @@ class DrinksAdminSite(admin.AdminSite):
             path('drinks/drink/', include(drink_admin.urls)),
         ]
         
-        return urls + drinks_urls
+        return drinks_urls + urls
 
 # Registrar o site de administração personalizado
 admin_site = DrinksAdminSite(name='drinks_admin')

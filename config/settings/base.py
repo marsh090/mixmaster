@@ -98,10 +98,14 @@ SPECTACULAR_SETTINGS = {
 API do MixMaster - Sistema de Gerenciamento de Drinks com IA
 
 Esta API fornece endpoints para:
+- Gerenciamento de drinks e seus componentes
+- Tipos de ingredientes e utensílios
+- Unidades de medida
+- Perfis de sabor
+- Ingredientes e utensílios
+- Receitas de drinks
 - Autenticação de usuários
 - Gerenciamento de usuários
-- (Em breve) Gerenciamento de drinks
-- (Em breve) Integração com IA
     ''',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
@@ -110,6 +114,10 @@ Esta API fornece endpoints para:
         'deepLinking': True,
         'persistAuthorization': True,
         'displayOperationId': True,
+        'defaultModelsExpandDepth': 3,
+        'defaultModelExpandDepth': 3,
+        'docExpansion': 'list',
+        'filter': True,
     },
     'SWAGGER_UI_DIST': 'SIDECAR',
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
@@ -117,5 +125,28 @@ Esta API fornece endpoints para:
     'TAGS': [
         {'name': 'auth', 'description': 'Endpoints de autenticação'},
         {'name': 'users', 'description': 'Gerenciamento de usuários'},
+        {'name': 'drinks', 'description': 'Gerenciamento de drinks'},
+        {'name': 'ingredients', 'description': 'Gerenciamento de ingredientes'},
+        {'name': 'utensils', 'description': 'Gerenciamento de utensílios'},
+        {'name': 'reference', 'description': 'Dados de referência (tipos, unidades, etc)'},
     ],
+    'ENUM_GENERATE_CHOICE_DESCRIPTION': True,
+    'ENUM_NAME_OVERRIDES': {
+        'NivelDificuldadeEnum': [
+            ('facil', 'Fácil'),
+            ('medio', 'Médio'),
+            ('dificil', 'Difícil')
+        ],
+        'TeorAlcoolicoEnum': [
+            ('zero', 'Zero'),
+            ('baixo', 'Baixo'),
+            ('medio', 'Médio'),
+            ('alto', 'Alto')
+        ],
+        'TipoUnidadeEnum': [
+            ('volume', 'Volume'),
+            ('peso', 'Peso'),
+            ('unidade', 'Unidade')
+        ]
+    }
 }
