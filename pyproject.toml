@@ -1,41 +1,36 @@
-[project]
+[tool.poetry]
 name = "mixmaster"
 version = "0.1.0"
 description = "Backend do MixMaster, site de IA de drinks"
-authors = [
-    {name = "Lucas Zanon Guarnier",email = "lucas.guarnier@globalsys.com.br"}
-]
-license = {text = "MIT"}
+authors = ["Lucas Zanon Guarnier <lucas.guarnier@globalsys.com.br>"]
+license = "MIT"
 readme = "README.md"
-requires-python = ">=3.9,<4.0"
-dependencies = [
-    "django>=4.2.0,<5.0.0",
-    "djangorestframework>=3.14.0,<4.0.0",
-    "djangorestframework-simplejwt>=5.3.0,<6.0.0",
-    "pymongo>=4.13.0,<5.0.0",
-    "django-cors-headers>=4.3.0,<5.0.0",
-    "python-dotenv>=1.1.0,<2.0.0",
-    "pytz>=2024.1",
-    "drf-spectacular>=0.27.0,<0.28.0",
-    "drf-spectacular-sidecar>=2024.3.4,<2025.0.0"
-]
-
-[project.optional-dependencies]
-dev = [
-    "google-generativeai>=0.8.5,<0.9.0",
-    "langchain>=0.3.25,<0.4.0",
-    "chromadb>=1.0.10,<2.0.0",
-    "celery>=5.5.2,<6.0.0",
-    "redis>=6.1.0,<7.0.0",
-    "uvicorn>=0.34.2,<0.35.0",
-    "logger>=1.4,<2.0"
-]
-
-[tool.poetry]
 packages = [
     {include = "apps"},
     {include = "config"}
 ]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+django = ">=4.2.0,<5.0.0"
+djangorestframework = ">=3.14.0,<4.0.0"
+djangorestframework-simplejwt = ">=5.3.0,<6.0.0"
+pymongo = ">=4.13.0,<5.0.0"
+django-cors-headers = ">=4.3.0,<5.0.0"
+python-dotenv = ">=1.1.0,<2.0.0"
+pytz = ">=2024.1"
+drf-spectacular = ">=0.27.0,<0.28.0"
+drf-spectacular-sidecar = ">=2024.3.4,<2025.0.0"
+sqlparse = ">=0.3.1"
+
+[tool.poetry.group.dev.dependencies]
+google-generativeai = ">=0.8.5,<0.9.0"
+langchain = ">=0.3.25,<0.4.0"
+chromadb = ">=1.0.10,<2.0.0"
+celery = ">=5.5.2,<6.0.0"
+redis = ">=6.1.0,<7.0.0"
+uvicorn = ">=0.34.2,<0.35.0"
+logger = ">=1.4,<2.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
