@@ -1,17 +1,21 @@
 from .base import *
-import os
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 DEBUG = False
-ALLOWED_HOSTS = ['.vercel.app', 'your-domain.com']
+ALLOWED_HOSTS = ['.vercel.app', 'localhost', '127.0.0.1']
 
-# Configuração de arquivos estáticos
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
-# Configuração de segurança
-SECURE_SSL_REDIRECT = True
+# Security
+SECURE_SSL_REDIRECT = False  # Vercel já lida com SSL
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Static files
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
+
+# CORS
+CORS_ALLOW_ALL_ORIGINS = True  # Você pode restringir isso para origens específicas
+CORS_ALLOW_CREDENTIALS = True
+
+# Middleware específico para Vercel
+MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')

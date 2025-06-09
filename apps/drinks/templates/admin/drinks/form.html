@@ -1,0 +1,41 @@
+{% extends "admin/drinks/base.html" %}
+{% load i18n admin_urls static %}
+
+{% block content %}
+<div id="content-main">
+    <form method="post" id="{{ opts.model_name }}_form" novalidate>
+        {% csrf_token %}
+        
+        <div>
+            {% if form.errors %}
+                <p class="errornote">
+                {% if form.errors|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+                </p>
+                {{ form.non_field_errors }}
+            {% endif %}
+
+            <fieldset class="module aligned">
+                {% for field in form %}
+                    <div class="form-row field-{{ field.name }}">
+                        <div>
+                            {{ field.errors }}
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="help">{{ field.help_text|safe }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </fieldset>
+
+            <div class="submit-row">
+                {% if show_save %}<input type="submit" value="{% trans 'Save' %}" class="default" name="_save">{% endif %}
+                {% if show_save_and_continue %}<input type="submit" value="{% trans 'Save and continue editing' %}" name="_continue">{% endif %}
+                {% if show_save_and_add_another %}<input type="submit" value="{% trans 'Save and add another' %}" name="_addanother">{% endif %}
+                {% if show_delete %}<a href="{{ delete_url }}" class="deletelink">{% trans "Delete" %}</a>{% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %} 
