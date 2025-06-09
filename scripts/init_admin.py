@@ -8,12 +8,20 @@ django.setup()
 User = get_user_model()
 
 def create_superuser():
-    if not User.objects.filter(username='zanon').exists():
+    email = 'admin@admin.com'
+    if not User.objects.filter(email=email).exists():
         User.objects.create_superuser(
-            username='zanon',
-            email='lucas.guarnier@globalsys.com.br',
+            username='admin',
+            email=email,
             password='admin123'
         )
         print('Superuser created successfully!')
+        print(f'Login with email: {email}')
+        print('Password: admin123')
     else:
-        print('Superuser already exists.') 
+        print('Superuser already exists.')
+        print(f'Login with email: {email}')
+        print('Password: admin123')
+
+if __name__ == '__main__':
+    create_superuser() 
