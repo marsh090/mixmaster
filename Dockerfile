@@ -37,6 +37,7 @@ EXPOSE 8000
 
 # Create startup script
 RUN echo '#!/bin/bash\n\
+cd /app\n\
 echo "Running database migrations..."\n\
 poetry run python manage.py migrate --noinput\n\
 echo "Creating admin user..."\n\

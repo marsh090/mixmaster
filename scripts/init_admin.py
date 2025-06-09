@@ -1,9 +1,17 @@
 import os
 import sys
+from pathlib import Path
+
+# Adiciona o diretório raiz do projeto ao PYTHONPATH
+BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.append(str(BASE_DIR))
+
 import django
 from django.contrib.auth import get_user_model
 
 print('Initializing admin user creation script...')
+print(f'Project root directory: {BASE_DIR}')
+print(f'Python path: {sys.path}')
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.development')
 django.setup()
@@ -42,6 +50,8 @@ def create_superuser():
             
     except Exception as e:
         print(f'Error creating superuser: {str(e)}')
+        print(f'Current directory: {os.getcwd()}')
+        print(f'Directory contents: {os.listdir()}')
         sys.exit(1)
 
 if __name__ == '__main__':
