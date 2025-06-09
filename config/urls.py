@@ -1,9 +1,19 @@
 from django.urls import path, include
+from django.http import JsonResponse
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 from apps.drinks.admin import admin_site
 
+def health_check(request):
+    return JsonResponse({
+        'status': 'healthy',
+        'message': 'MixMaster API is running'
+    })
+
 urlpatterns = [
+    # Health Check
+    path('health/', health_check, name='health_check'),
+
     # Admin
     path('admin/', admin_site.urls),
 

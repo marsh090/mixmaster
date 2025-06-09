@@ -6,7 +6,8 @@
             "use": "@vercel/python",
             "config": {
                 "maxLambdaSize": "15mb",
-                "runtime": "python3.9"
+                "runtime": "python3.9",
+                "buildCommand": "pip install -r requirements.txt && python manage.py create_superuser"
             }
         }
     ],
@@ -20,7 +21,10 @@
         "PYTHONPATH": ".",
         "DJANGO_SETTINGS_MODULE": "config.settings.production",
         "ALLOWED_HOSTS": ".vercel.app",
-        "PYTHON_VERSION": "3.9"
+        "PYTHON_VERSION": "3.9",
+        "VERCEL_BUILD_SYSTEM_REPORT": "1"
     },
-    "buildCommand": "chmod +x scripts/vercel_init.sh && ./scripts/vercel_init.sh"
+    "crons": {
+        "clear_cache": "0 0 * * *"
+    }
 }

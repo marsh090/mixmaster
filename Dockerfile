@@ -5,7 +5,8 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     POETRY_VERSION=1.7.1 \
     POETRY_HOME="/opt/poetry" \
-    POETRY_VIRTUALENVS_CREATE=false
+    POETRY_VIRTUALENVS_CREATE=false \
+    DJANGO_SETTINGS_MODULE=config.settings.development
 
 # Add Poetry to PATH
 ENV PATH="$POETRY_HOME/bin:$PATH"
@@ -25,11 +26,14 @@ WORKDIR /app
 # Copy project files
 COPY pyproject.toml poetry.lock ./
 
-# Install dependencies
-RUN poetry install --no-interaction --no-ansi --no-root
+# Install dependencies including dev dependencies
+RUN poetry install --no-interaction --no-ansi --no-root --with dev
 
 # Copy project
 COPY . .
 
-# Run the application
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
+# Expose port
+EXPOSE 8000
+
+# Run the development server
+CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
