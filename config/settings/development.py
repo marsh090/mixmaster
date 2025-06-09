@@ -14,6 +14,14 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:3000'
 ]
 
+# Database for Django admin and sessions
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
 # MongoDB settings (connection will be established when needed)
 MONGODB_URI = os.environ.get('MONGODB_URI')
 MONGODB_NAME = os.environ.get('MONGODB_NAME')

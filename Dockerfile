@@ -35,5 +35,12 @@ COPY . .
 # Expose port
 EXPOSE 8000
 
-# Run the development server
-CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Create startup script
+RUN echo '#!/bin/bash\n\
+poetry run python manage.py migrate --noinput\n\
+poetry run python scripts/init_admin.py\n\
+poetry run python manage.py runserver 0.0.0.0:8000' > /app/start.sh \
+    && chmod +x /app/start.sh
+
+# Run the startup script
+CMD ["/app/start.sh"]

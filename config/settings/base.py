@@ -15,14 +15,6 @@ MONGODB_URI = os.environ.get('MONGODB_URI')
 MONGODB_CLIENT = pymongo.MongoClient(MONGODB_URI)
 MONGODB_DB = MONGODB_CLIENT[os.environ.get('MONGODB_NAME')]
 
-# Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.dummy',  # Não usamos ORM do Django
-        'NAME': os.environ.get('MONGODB_NAME'),
-    }
-}
-
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
