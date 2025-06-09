@@ -37,8 +37,11 @@ EXPOSE 8000
 
 # Create startup script
 RUN echo '#!/bin/bash\n\
+echo "Running database migrations..."\n\
 poetry run python manage.py migrate --noinput\n\
+echo "Creating admin user..."\n\
 poetry run python scripts/init_admin.py\n\
+echo "Starting Django development server..."\n\
 poetry run python manage.py runserver 0.0.0.0:8000' > /app/start.sh \
     && chmod +x /app/start.sh
 
